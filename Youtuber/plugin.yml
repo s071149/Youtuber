@@ -1,0 +1,10 @@
+name: Youtuber
+author: TrpkGod
+version: 1.6.7
+description: Youtuber Plugin
+main: TrpkGod.Youtuber.Youtuber
+commands:
+  Youtuber:
+    description: Shows a list of youtubers.
+  Yt:
+    description: Allowes you to perform the commands.
