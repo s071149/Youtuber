@@ -110,10 +110,6 @@ public class Youtuber extends JavaPlugin {
 						if (args[1].equalsIgnoreCase("help")) {
 							p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Administration" + ChatColor.GRAY + "]:-------");
 							p.sendMessage(ChatColor.GRAY + "/yt admin help ---> Display's all the admin commands.");
-							p.sendMessage(ChatColor.GRAY + "/yt admin gui ---> Open's a gui fo admin options.");
-						}
-						if (args[1].equalsIgnoreCase("gui")) {
-							p.sendMessage("Coming Soon");
 						}
 					}
 				}
