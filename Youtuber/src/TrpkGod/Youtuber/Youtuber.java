@@ -31,7 +31,6 @@ public class Youtuber extends JavaPlugin {
 
 		getConfig().options().copyDefaults(true);
 		saveConfig();
-		getServer().getPluginManager().registerEvents(new YoutuberListener(), this);
 	}
 
 	public void onDisable() {
