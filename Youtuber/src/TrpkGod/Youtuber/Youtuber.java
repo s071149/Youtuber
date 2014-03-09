@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,11 @@ public class Youtuber extends JavaPlugin {
 
 	public static ArrayList<String> youtube = new ArrayList<String>();
 	public static ArrayList<String> twitch = new ArrayList<String>();
+
+	public static StopWatch sw = new StopWatch();
+	public static long elapsed = sw.getTime();
+	
+	public boolean recording = false;
 
 	public void onEnable() {
 		this.log = new YoutuberLogger(this);
@@ -92,11 +98,19 @@ public class Youtuber extends JavaPlugin {
 				if (args[0].equalsIgnoreCase("record")) {
 					if (p.hasPermission("youtuber.record")) {
 						if (args[1].equalsIgnoreCase("y")) {
+							sw.start();
+							recording = true;
 							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, he/she may not respond.");
 						} else if (args[1].equalsIgnoreCase("t")) {
+							sw.start();
+							recording = true;
 							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "A TwitchTV livestream has just been put up by " + ChatColor.DARK_RED + p.getName() + ".");
 						} else if (args[1].equalsIgnoreCase("end")) {
+							sw.stop();
+							recording = false;
 							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just ended there Recording.");
+						} else if (args[1].equalsIgnoreCase("time")) {
+							p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You've been recording for " + elapsed + "minutes.");
 						} else {
 							p.sendMessage(ChatColor.RED + "Please use the correct format.");
 						}
@@ -109,6 +123,14 @@ public class Youtuber extends JavaPlugin {
 						if (args[1].equalsIgnoreCase("help")) {
 							p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Administration" + ChatColor.GRAY + "]:-------");
 							p.sendMessage(ChatColor.GRAY + "/yt admin help ---> Display's all the admin commands.");
+							p.sendMessage(ChatColor.GRAY + "/yt admin request stop ---> Request user's to stop there recoridng.");
+						} else if(args[1].equalsIgnoreCase("request")) {
+							if(args[2].equalsIgnoreCase("stop")) {
+								
+								if(recording) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " have requested you to stop you're recording.");
+								}
+							}
 						}
 					}
 				}
