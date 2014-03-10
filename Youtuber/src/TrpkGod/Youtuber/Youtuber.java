@@ -27,7 +27,7 @@ public class Youtuber extends JavaPlugin {
 
 	public static StopWatch sw = new StopWatch();
 	public static long elapsed = sw.getTime();
-	
+
 	public boolean recording = false;
 
 	public void onEnable() {
@@ -98,17 +98,29 @@ public class Youtuber extends JavaPlugin {
 				if (args[0].equalsIgnoreCase("record")) {
 					if (p.hasPermission("youtuber.record")) {
 						if (args[1].equalsIgnoreCase("y")) {
-							sw.start();
-							recording = true;
-							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, he/she may not respond.");
+							if (recording == true) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already recording, use [/yt record end] to stop your recording");
+							} else {
+								sw.start();
+								recording = true;
+								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, he/she may not respond.");
+							}
 						} else if (args[1].equalsIgnoreCase("t")) {
-							sw.start();
-							recording = true;
-							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "A TwitchTV livestream has just been put up by " + ChatColor.DARK_RED + p.getName() + ".");
+							if (recording == true) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already livestreaming, use [/yt record end] to stop your recording");
+							} else {
+								sw.start();
+								recording = true;
+								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "A TwitchTV livestream has just been put up by " + ChatColor.DARK_RED + p.getName() + ".");
+							}
 						} else if (args[1].equalsIgnoreCase("end")) {
-							sw.stop();
-							recording = false;
-							this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just ended there Recording.");
+							if (recording == false) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're not recording...why you want to end it?");
+							} else {
+								sw.stop();
+								recording = false;
+								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just ended there Recording.");
+							}
 						} else if (args[1].equalsIgnoreCase("time")) {
 							p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You've been recording for " + elapsed + "minutes.");
 						} else {
@@ -124,11 +136,10 @@ public class Youtuber extends JavaPlugin {
 							p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Administration" + ChatColor.GRAY + "]:-------");
 							p.sendMessage(ChatColor.GRAY + "/yt admin help ---> Display's all the admin commands.");
 							p.sendMessage(ChatColor.GRAY + "/yt admin request stop ---> Request user's to stop there recoridng.");
-						} else if(args[1].equalsIgnoreCase("request")) {
-							if(args[2].equalsIgnoreCase("stop")) {
-								
-								if(recording) {
-								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " have requested you to stop you're recording.");
+						} else if (args[1].equalsIgnoreCase("request")) {
+							if (args[2].equalsIgnoreCase("stop")) {
+								if (recording) {
+									p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " have requested you to stop you're recording.");
 								}
 							}
 						}
