@@ -4,8 +4,6 @@ import java.util.logging.Logger;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import TrpkGod.Youtuber.Youtuber;
-
 public class YoutuberLogger {
 	  private Youtuber plugin;
 	  private Logger log;

@@ -1,10 +1,9 @@
 package TrpkGod.Youtuber;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.time.StopWatch;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,18 +21,16 @@ public class Youtuber extends JavaPlugin {
 	public static Youtuber plugin;
 	protected YoutuberLogger log;
 
-	public static ArrayList<String> youtube = new ArrayList<String>();
-	public static ArrayList<String> twitch = new ArrayList<String>();
-
-	public static StopWatch sw = new StopWatch();
-	public static long elapsed = sw.getTime();
-
 	public boolean recording = false;
+	public String gender = null;
+	public String youtube;
+	public String twitch;
+	public String incMsg = "Incorrect format: /<command> <subcommand> <args>";
 
 	public void onEnable() {
-		this.log = new YoutuberLogger(this);
+		log = new YoutuberLogger(this);
 
-		getLogger().info("Youtuber Loaded");
+		getLogger().info("Youtuber Enabled.");
 
 		getConfig().options().copyDefaults(true);
 		saveConfig();
@@ -46,107 +43,133 @@ public class Youtuber extends JavaPlugin {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player p = (Player) sender;
+		if (!(p instanceof Player)) {
+			p.sendMessage(ChatColor.RED + "Must be a player to use commands.");
+			return true;
+		}
+		if (gender == null) {
+			gender = "they";
+		} else if (gender == "boy") {
+			gender = "he";
+		} else if (gender == "girl") {
+			gender = "she";
+		}
 		if (cmd.getName().equalsIgnoreCase("youtuber")) {
 			p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Youtuber Plugin" + ChatColor.GRAY + "]:-------");
-			p.sendMessage(ChatColor.GRAY + "/youtuber ---> Shows a list of commands.");
-			p.sendMessage(ChatColor.GRAY + "/yt ---> Default command.");
-			if (p.hasPermission("youtuber.info.reload")) {
-				p.sendMessage(ChatColor.GRAY + "/yt info reload ---> Reload the configs.");
+			p.sendMessage(ChatColor.GRAY + "/youtube");
+			if(p.hasPermission("youtuber.record")) {
+				p.sendMessage(ChatColor.GRAY + "/youtube record [start / stop]");
 			}
-			p.sendMessage(ChatColor.GRAY + "/yt info author ---> View who made the plugin.");
-			p.sendMessage(ChatColor.GRAY + "/yt list y ---> Shows a list of youtubers in the server.");
-			p.sendMessage(ChatColor.GRAY + "/yt list t ---> Shows a list of twicher's in the server.");
-			if (p.hasPermission("youtuber.record")) {
-				p.sendMessage(ChatColor.GRAY + "/yt record y ---> Announces that you are recoding to the server.");
-				p.sendMessage(ChatColor.GRAY + "/yt record t ---> Announces that you are twitching to the server.");
-				p.sendMessage(ChatColor.GRAY + "/yt record end ---> Announces to the server that you have ended your Recording/LiveStream.");
+			p.sendMessage(ChatColor.GRAY + "/youtube list");
+			p.sendMessage(ChatColor.GRAY + " ");
+			p.sendMessage(ChatColor.GRAY + "/twitch");
+			if(p.hasPermission("youtuber.record")) {
+				p.sendMessage(ChatColor.GRAY + "/twitch record [start / stop]");
 			}
-			if (p.hasPermission("youtuber.admin")) {
-				p.sendMessage(ChatColor.GRAY + "/yt admin gui ---> Open's up a gui for admin options.");
+			p.sendMessage(ChatColor.GRAY + "/twitch list");
+			p.sendMessage(ChatColor.GRAY + "");
+			if(p.hasPermission("youtuber.api")) {
+				p.sendMessage(ChatColor.GRAY + "/api");
+				if(p.hasPermission("youtuber.api.gender")) {
+					p.sendMessage(ChatColor.GRAY + "/api gender [boy / girl]");
+				}
+				if(p.hasPermission("youtuber.api.setup")) {
+					p.sendMessage(ChatColor.GRAY + "/api setup [install / reinstall / uninstall]");
+				}
+				p.sendMessage(ChatColor.GRAY + "");
 			}
-		}
-		if (cmd.getName().equalsIgnoreCase("yt")) {
+			p.sendMessage(ChatColor.GRAY + "Created by TrpkGod.");
+		} else if (cmd.getName().equalsIgnoreCase("youtube")) {
 			if (args.length > 0) {
-				if (args[0].equalsIgnoreCase("info")) {
-					if (args[1].equalsIgnoreCase("reload")) {
-						if (p.hasPermission("youtuber.info.reload")) {
-							try {
-								this.reloadConfig();
-								this.saveConfig();
-								p.sendMessage(ChatColor.GREEN + "Youtuber v" + getDescription().getVersion() + " reloaded.");
-							} catch (Exception e) {
-								p.sendMessage(ChatColor.RED + "Youtuber v" + getDescription().getVersion() + " could not be reloaded.");
+				if(p.hasPermission("youtuber.record")) {
+					if (args[0].equalsIgnoreCase("record")) {
+						if (args[1].equalsIgnoreCase("start")) {
+							if (recording == true) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already recording, use [/youtube record stop] to stop your recording");
+							} else {
+								recording = true;
+								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, " + gender + " may not respond.");
 							}
+						} else if (args[1].equalsIgnoreCase("stop")) {
+							if (recording == false) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're not recording, please start recording to stop recording.");
+							} else {
+								recording = false;
+								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just stop recording.");
+							}
+						} else {
+							p.sendMessage(ChatColor.RED + incMsg);
 						}
-					} else if (args[1].equalsIgnoreCase("author")) {
-						p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "Youtuber was created by TrpkGod!");
-					} else {
-						p.sendMessage(ChatColor.RED + "Please use the correct format.");
 					}
+				} else {
+					p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
+				}
+				
+				if (args[0].equalsIgnoreCase("list")) {
+					p.sendMessage(ChatColor.RED + "Youtube List:");
+					p.sendMessage(ChatColor.GRAY + getConfig().getString(youtube));
+				}
+			}
+		} else if (cmd.getName().equalsIgnoreCase("twitch")) {
+			if (args.length > 0) {
+				if(p.hasPermission("youtuber.record")) {
+					if (args[0].equalsIgnoreCase("record")) {
+						if (args[1].equalsIgnoreCase("start")) {
+							if (recording == true) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already livestreaming, use [/twitch record stop] to stop your livestream");
+							} else {
+								recording = true;
+								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to livestream, " + gender + " may not respond.");
+							}
+						} else if (args[1].equalsIgnoreCase("stop")) {
+							if (recording == false) {
+								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're not livestreaming, please start livestreaming to stop livestreaming.");
+							} else {
+								recording = false;
+								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just stop livestreaming.");
+							}
+						} else {
+							p.sendMessage(ChatColor.RED + incMsg);
+						}
+					}
+				} else {
+					p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 				}
 				if (args[0].equalsIgnoreCase("list")) {
-					if (args[1].equalsIgnoreCase("y")) {
-						p.sendMessage(ChatColor.RED + "Youtube List:");
-						p.sendMessage(ChatColor.GRAY + getConfig().getString("youtube"));
-					} else if (args[1].equalsIgnoreCase("t")) {
-						p.sendMessage(ChatColor.RED + "Twitch List:");
-						p.sendMessage(ChatColor.GRAY + getConfig().getString("twitch"));
-					} else {
-						p.sendMessage(ChatColor.RED + "Please use the correct format.");
-					}
+					p.sendMessage(ChatColor.RED + "Twitch List:");
+					p.sendMessage(ChatColor.GRAY + getConfig().getString(twitch));
 				}
-				if (args[0].equalsIgnoreCase("record")) {
-					if (p.hasPermission("youtuber.record")) {
-						if (args[1].equalsIgnoreCase("y")) {
-							if (recording == true) {
-								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already recording, use [/yt record end] to stop your recording");
+			}	
+		}
+		if(p.hasPermission("youtuber.api")) {
+			if (cmd.getName().equalsIgnoreCase("api")) {
+				if(args.length > 0) {
+					if(p.hasPermission("youtuber.api.gender")) {
+						if(args[0].equalsIgnoreCase("gender")) {
+							if(args[1].equalsIgnoreCase("boy")) {
+								gender = "boy";
+								p.sendMessage(ChatColor.GREEN + "Gender set to " + gender + ".");
+							} else if(args[1].equalsIgnoreCase("girl")) {
+								gender = "girl";
+								p.sendMessage(ChatColor.GREEN + "Gender set to " + gender + ".");
 							} else {
-								sw.start();
-								recording = true;
-								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, he/she may not respond.");
+								p.sendMessage(ChatColor.RED + incMsg);
 							}
-						} else if (args[1].equalsIgnoreCase("t")) {
-							if (recording == true) {
-								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already livestreaming, use [/yt record end] to stop your recording");
-							} else {
-								sw.start();
-								recording = true;
-								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "A TwitchTV livestream has just been put up by " + ChatColor.DARK_RED + p.getName() + ".");
-							}
-						} else if (args[1].equalsIgnoreCase("end")) {
-							if (recording == false) {
-								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're not recording...why you want to end it?");
-							} else {
-								sw.stop();
-								recording = false;
-								this.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just ended there Recording.");
-							}
-						} else if (args[1].equalsIgnoreCase("time")) {
-							p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You've been recording for " + elapsed + "minutes.");
-						} else {
-							p.sendMessage(ChatColor.RED + "Please use the correct format.");
+						}
+					} else {
+						p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
+					}
+					if(p.hasPermission("youtuber.api.setup")) {
+						if(args[0].equalsIgnoreCase("setup")) {
+							p.sendMessage("Coming Soon");
 						}
 					} else {
 						p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 					}
 				}
-				if (args[0].equalsIgnoreCase("admin")) {
-					if (p.hasPermission("youtuber.admin")) {
-						if (args[1].equalsIgnoreCase("help")) {
-							p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Administration" + ChatColor.GRAY + "]:-------");
-							p.sendMessage(ChatColor.GRAY + "/yt admin help ---> Display's all the admin commands.");
-							p.sendMessage(ChatColor.GRAY + "/yt admin request stop ---> Request user's to stop there recoridng.");
-						} else if (args[1].equalsIgnoreCase("request")) {
-							if (args[2].equalsIgnoreCase("stop")) {
-								if (recording) {
-									p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " have requested you to stop you're recording.");
-								}
-							}
-						}
-					}
-				}
-				return false;
 			}
+		} else {
+			p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 		}
 		return false;
 	}
