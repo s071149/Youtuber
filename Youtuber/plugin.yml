@@ -1,6 +1,6 @@
 name: Youtuber
 author: TrpkGod
-version: 1.7.5
+version: 1.7.7
 description: Youtuber Plugin
 main: TrpkGod.Youtuber.Youtuber
 commands:

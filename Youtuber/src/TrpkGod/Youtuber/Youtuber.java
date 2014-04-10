@@ -22,9 +22,10 @@ public class Youtuber extends JavaPlugin {
 	protected YoutuberLogger log;
 
 	public boolean recording = false;
+	public boolean installed = false;
 	public String gender = null;
-	public String youtube;
-	public String twitch;
+	public String youtube = getConfig().getString("youtube");
+	public String twitch = getConfig().getString("twitch");
 	public String incMsg = "Incorrect format: /<command> <subcommand> <args>";
 
 	public void onEnable() {
@@ -55,25 +56,25 @@ public class Youtuber extends JavaPlugin {
 			gender = "she";
 		}
 		if (cmd.getName().equalsIgnoreCase("youtuber")) {
-			p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Youtuber Plugin" + ChatColor.GRAY + "]:-------");
+			p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Youtuber Plugin v" + getDescription().getVersion() + ChatColor.GRAY + "]:-------");
 			p.sendMessage(ChatColor.GRAY + "/youtube");
-			if(p.hasPermission("youtuber.record")) {
-				p.sendMessage(ChatColor.GRAY + "/youtube record [start / stop]");
+			if (p.hasPermission("youtuber.record")) {
+				p.sendMessage(ChatColor.GRAY + "/youtube -r [start / stop]");
 			}
 			p.sendMessage(ChatColor.GRAY + "/youtube list");
 			p.sendMessage(ChatColor.GRAY + " ");
 			p.sendMessage(ChatColor.GRAY + "/twitch");
-			if(p.hasPermission("youtuber.record")) {
-				p.sendMessage(ChatColor.GRAY + "/twitch record [start / stop]");
+			if (p.hasPermission("youtuber.record")) {
+				p.sendMessage(ChatColor.GRAY + "/twitch -r [start / stop]");
 			}
 			p.sendMessage(ChatColor.GRAY + "/twitch list");
 			p.sendMessage(ChatColor.GRAY + "");
-			if(p.hasPermission("youtuber.api")) {
+			if (p.hasPermission("youtuber.api")) {
 				p.sendMessage(ChatColor.GRAY + "/api");
-				if(p.hasPermission("youtuber.api.gender")) {
+				if (p.hasPermission("youtuber.api.gender")) {
 					p.sendMessage(ChatColor.GRAY + "/api gender [boy / girl]");
 				}
-				if(p.hasPermission("youtuber.api.setup")) {
+				if (p.hasPermission("youtuber.api.setup")) {
 					p.sendMessage(ChatColor.GRAY + "/api setup [install / reinstall / uninstall]");
 				}
 				p.sendMessage(ChatColor.GRAY + "");
@@ -81,8 +82,8 @@ public class Youtuber extends JavaPlugin {
 			p.sendMessage(ChatColor.GRAY + "Created by TrpkGod.");
 		} else if (cmd.getName().equalsIgnoreCase("youtube")) {
 			if (args.length > 0) {
-				if(p.hasPermission("youtuber.record")) {
-					if (args[0].equalsIgnoreCase("record")) {
+				if (p.hasPermission("youtuber.record")) {
+					if (args[0].equalsIgnoreCase("-r")) {
 						if (args[1].equalsIgnoreCase("start")) {
 							if (recording == true) {
 								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already recording, use [/youtube record stop] to stop your recording");
@@ -104,16 +105,16 @@ public class Youtuber extends JavaPlugin {
 				} else {
 					p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 				}
-				
+
 				if (args[0].equalsIgnoreCase("list")) {
 					p.sendMessage(ChatColor.RED + "Youtube List:");
-					p.sendMessage(ChatColor.GRAY + getConfig().getString(youtube));
+					p.sendMessage(ChatColor.GRAY + youtube);
 				}
 			}
 		} else if (cmd.getName().equalsIgnoreCase("twitch")) {
 			if (args.length > 0) {
-				if(p.hasPermission("youtuber.record")) {
-					if (args[0].equalsIgnoreCase("record")) {
+				if (p.hasPermission("youtuber.record")) {
+					if (args[0].equalsIgnoreCase("-r")) {
 						if (args[1].equalsIgnoreCase("start")) {
 							if (recording == true) {
 								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already livestreaming, use [/twitch record stop] to stop your livestream");
@@ -137,19 +138,19 @@ public class Youtuber extends JavaPlugin {
 				}
 				if (args[0].equalsIgnoreCase("list")) {
 					p.sendMessage(ChatColor.RED + "Twitch List:");
-					p.sendMessage(ChatColor.GRAY + getConfig().getString(twitch));
+					p.sendMessage(ChatColor.GRAY + twitch);
 				}
-			}	
+			}
 		}
-		if(p.hasPermission("youtuber.api")) {
+		if (p.hasPermission("youtuber.api")) {
 			if (cmd.getName().equalsIgnoreCase("api")) {
-				if(args.length > 0) {
-					if(p.hasPermission("youtuber.api.gender")) {
-						if(args[0].equalsIgnoreCase("gender")) {
-							if(args[1].equalsIgnoreCase("boy")) {
+				if (args.length > 0) {
+					if (p.hasPermission("youtuber.api.gender")) {
+						if (args[0].equalsIgnoreCase("gender")) {
+							if (args[1].equalsIgnoreCase("boy")) {
 								gender = "boy";
 								p.sendMessage(ChatColor.GREEN + "Gender set to " + gender + ".");
-							} else if(args[1].equalsIgnoreCase("girl")) {
+							} else if (args[1].equalsIgnoreCase("girl")) {
 								gender = "girl";
 								p.sendMessage(ChatColor.GREEN + "Gender set to " + gender + ".");
 							} else {
@@ -159,9 +160,33 @@ public class Youtuber extends JavaPlugin {
 					} else {
 						p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 					}
-					if(p.hasPermission("youtuber.api.setup")) {
-						if(args[0].equalsIgnoreCase("setup")) {
-							p.sendMessage("Coming Soon");
+					if (p.hasPermission("youtuber.api.setup")) {
+						if (args[0].equalsIgnoreCase("setup")) {
+							if (args[1].equalsIgnoreCase("install")) {
+								boolean workspace = true;
+								if (installed == false) {
+									p.sendMessage(ChatColor.GREEN + "Enabling workspace.");
+									if (workspace == true) {
+										p.sendMessage(ChatColor.GREEN + "Workspace installed successfully.");
+									} else {
+										p.sendMessage(ChatColor.RED + "Error occured while enabling workspace.");
+									}
+								} else {
+									p.sendMessage(ChatColor.RED + "Youtuber's API is already installed.");
+								}
+							} else if (args[1].equalsIgnoreCase("reinstall")) {
+								if (installed = true) {
+
+								} else {
+									p.sendMessage(ChatColor.RED + "Youtuber's API isn't installed.");
+								}
+							} else if (args[1].equalsIgnoreCase("uninstall")) {
+								if (installed = true) {
+
+								} else {
+									p.sendMessage(ChatColor.RED + "Youtuber's API isn't installed.");
+								}
+							}
 						}
 					} else {
 						p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
