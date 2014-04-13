@@ -1,6 +1,7 @@
 package TrpkGod.Youtuber;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -9,6 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Youtuber extends JavaPlugin {
@@ -24,9 +27,8 @@ public class Youtuber extends JavaPlugin {
 	public boolean recording = false;
 	public boolean installed = false;
 	public String gender = null;
-	public String youtube = getConfig().getString("youtube");
-	public String twitch = getConfig().getString("twitch");
 	public String incMsg = "Incorrect format: /<command> <subcommand> <args>";
+	public String record;
 
 	public void onEnable() {
 		log = new YoutuberLogger(this);
@@ -56,30 +58,48 @@ public class Youtuber extends JavaPlugin {
 			gender = "she";
 		}
 		if (cmd.getName().equalsIgnoreCase("youtuber")) {
-			p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Youtuber Plugin v" + getDescription().getVersion() + ChatColor.GRAY + "]:-------");
-			p.sendMessage(ChatColor.GRAY + "/youtube");
-			if (p.hasPermission("youtuber.record")) {
-				p.sendMessage(ChatColor.GRAY + "/youtube -r [start / stop]");
-			}
-			p.sendMessage(ChatColor.GRAY + "/youtube list");
-			p.sendMessage(ChatColor.GRAY + " ");
-			p.sendMessage(ChatColor.GRAY + "/twitch");
-			if (p.hasPermission("youtuber.record")) {
-				p.sendMessage(ChatColor.GRAY + "/twitch -r [start / stop]");
-			}
-			p.sendMessage(ChatColor.GRAY + "/twitch list");
-			p.sendMessage(ChatColor.GRAY + "");
-			if (p.hasPermission("youtuber.api")) {
-				p.sendMessage(ChatColor.GRAY + "/api");
-				if (p.hasPermission("youtuber.api.gender")) {
-					p.sendMessage(ChatColor.GRAY + "/api gender [boy / girl]");
+			if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+				if (!(p instanceof Player)) {
+					reloadConfig();
+					saveConfig();
+					p.sendMessage(ChatColor.GRAY + "[Youtuber] Config Reloaded! ");
+					return true;
+				} else if (p.hasPermission("youtuber.reload")) {
+					reloadConfig();
+					saveConfig();
+					p.sendMessage(ChatColor.GRAY + "[Youtuber] Config reloaded!");
+					return true;
 				}
-				if (p.hasPermission("youtuber.api.setup")) {
-					p.sendMessage(ChatColor.GRAY + "/api setup [install / reinstall / uninstall]");
+			} else {
+				p.sendMessage(ChatColor.GRAY + "-------:[" + ChatColor.RED + "Youtuber Plugin v" + getDescription().getVersion() + ChatColor.GRAY + "]:-------");
+				p.sendMessage(ChatColor.GRAY + "/youtube");
+				if (p.hasPermission("youtuber.record")) {
+					p.sendMessage(ChatColor.GRAY + "/youtube -r [start / stop]");
 				}
+				p.sendMessage(ChatColor.GRAY + "/youtube list");
+				p.sendMessage(ChatColor.GRAY + " ");
+				p.sendMessage(ChatColor.GRAY + "/twitch");
+				if (p.hasPermission("youtuber.record")) {
+					p.sendMessage(ChatColor.GRAY + "/twitch -r [start / stop]");
+				}
+				p.sendMessage(ChatColor.GRAY + "/twitch list");
 				p.sendMessage(ChatColor.GRAY + "");
+				if(p.hasPermission("youtuber.reload")) {
+					p.sendMessage(ChatColor.GRAY + "/youtuber reload");
+					p.sendMessage(ChatColor.GRAY + "");
+				}
+				if (p.hasPermission("youtuber.api")) {
+					p.sendMessage(ChatColor.GRAY + "/api");
+					if (p.hasPermission("youtuber.api.gender")) {
+						p.sendMessage(ChatColor.GRAY + "/api gender [boy / girl]");
+					}
+					if (p.hasPermission("youtuber.api.setup")) {
+						p.sendMessage(ChatColor.GRAY + "/api setup [install / reinstall / uninstall]");
+					}
+					p.sendMessage(ChatColor.GRAY + "");
+				}
+				p.sendMessage(ChatColor.GRAY + "Created by TrpkGod.");
 			}
-			p.sendMessage(ChatColor.GRAY + "Created by TrpkGod.");
 		} else if (cmd.getName().equalsIgnoreCase("youtube")) {
 			if (args.length > 0) {
 				if (p.hasPermission("youtuber.record")) {
@@ -89,6 +109,7 @@ public class Youtuber extends JavaPlugin {
 								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already recording, use [/youtube record stop] to stop your recording");
 							} else {
 								recording = true;
+								record = "recording";
 								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to record, " + gender + " may not respond.");
 							}
 						} else if (args[1].equalsIgnoreCase("stop")) {
@@ -108,7 +129,12 @@ public class Youtuber extends JavaPlugin {
 
 				if (args[0].equalsIgnoreCase("list")) {
 					p.sendMessage(ChatColor.RED + "Youtube List:");
-					p.sendMessage(ChatColor.GRAY + youtube);
+					List<String> youtube = getConfig().getStringList("youtube");
+					for (String msgYoutube : youtube) {
+						msgYoutube.replace(" ", "");
+						p.sendMessage(ChatColor.GRAY + " - " + msgYoutube);
+					}
+					return true;
 				}
 			}
 		} else if (cmd.getName().equalsIgnoreCase("twitch")) {
@@ -120,6 +146,7 @@ public class Youtuber extends JavaPlugin {
 								p.sendMessage(ChatColor.RED + "[Youtuber] " + ChatColor.AQUA + "You're already livestreaming, use [/twitch record stop] to stop your livestream");
 							} else {
 								recording = true;
+								record = "livestream";
 								Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + p.getName() + ChatColor.AQUA + " has just started to livestream, " + gender + " may not respond.");
 							}
 						} else if (args[1].equalsIgnoreCase("stop")) {
@@ -138,7 +165,12 @@ public class Youtuber extends JavaPlugin {
 				}
 				if (args[0].equalsIgnoreCase("list")) {
 					p.sendMessage(ChatColor.RED + "Twitch List:");
-					p.sendMessage(ChatColor.GRAY + twitch);
+					List<String> twitch = getConfig().getStringList("twitch");
+					for (String msgTwitch : twitch) {
+						msgTwitch.replace(" ", "");
+						p.sendMessage(ChatColor.GRAY + " - " + msgTwitch);
+					}
+					return true;
 				}
 			}
 		}
@@ -197,5 +229,13 @@ public class Youtuber extends JavaPlugin {
 			p.sendMessage(ChatColor.RED + "You don't have permission for this command.");
 		}
 		return false;
+	}
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		if(recording == true) {
+			recording = false;
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "[Youtuber] " + ChatColor.DARK_RED + e.getPlayer() + "has left the server without ending there " + record + ".");
+		}
 	}
 }
