@@ -1,14 +1,13 @@
-# Default : config.yml
 youtube:
-  - name1
-  - name2
-  - name3
-  - name4
-  - name5
-
+  - Name1 
+  - Name2
+  - Name3
+  - Name4
+  - Name5
+  
 twitch:
-  - name1
-  - name2
-  - name3
-  - name4
-  - name5
+  - Name1
+  - Name2
+  - Name3
+  - Name4
+  - Name5

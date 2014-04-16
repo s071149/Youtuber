@@ -1,14 +1,15 @@
 name: Youtuber
 author: TrpkGod
-version: 1.8.1
+version: 1.8.9
 description: Youtuber Plugin
 main: TrpkGod.Youtuber.Youtuber
 commands:
   Youtuber:
-    description: Shows a list of commands.
+    usage: /<command> <args>
+    description: Base command for the plugin.
   Youtube:
-    description: Base command for any youtube commands.
+    usage: /<command> <args>
+    description: Base command for Youtube.
   Twitch:
-    description: Base command for any twitch commands.
-  Api:
-    description: Base command for any youtube or twitch api commands.
+    usage: /<command> <args>
+    description: Base command for Twitch.
