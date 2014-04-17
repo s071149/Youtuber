@@ -44,17 +44,25 @@ public class SettingsManager {
 				e.printStackTrace();
 			}
 		}
-
+		
 		config = YamlConfiguration.loadConfiguration(cfile); */
 	}
 
-	public void addYoutuber(String p) {
-		config.addDefault("youtube", p);
+	public void addYoutuber(String p, String link) {
+		setYoutuber(p, link);
+	}
+	
+	public void addLivestreamer(String p, String link) {
+		setLivestreamer(p, link);
+	}
+	
+	public void setLivestreamer(String p, String link) {
+		config.set("config." + p.toLowerCase(), link);
 		save();
 	}
-
-	public void addTwitch(String p) {
-		config.addDefault("twitch", p);
+	
+	public void setYoutuber(String p, String link) {
+		config.set("config." + p.toLowerCase(), link);
 		save();
 	}
 
